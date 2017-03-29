@@ -75,12 +75,13 @@ func ExampleSeekPathConflict() {
 					return err
 				}
 
+				// Check for conflicts.
 				if k, _ := SeekPathConflict(b.Cursor(), []byte(path)); k != nil {
 					fmt.Printf("Put(%s) blocked - conflict: %s\n", path, string(k))
 					return nil
 				}
 
-				// Put a variable path.
+				// Put.
 				if err := b.Put([]byte(path), []byte{}); err != nil {
 					return err
 				}
@@ -90,8 +91,11 @@ func ExampleSeekPathConflict() {
 				log.Fatal(err)
 			}
 		}
+		// Put
 		insert("/blogs/")
+		// Put
 		insert("/blogs/:blog_id")
+		// Conflict
 		insert("/blogs/a_blog")
 	})
 
