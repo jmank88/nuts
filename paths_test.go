@@ -36,7 +36,7 @@ func exDB(f func(db *bolt.DB)) {
 	f(db)
 }
 
-func ExamplePathMatch() {
+func ExampleSeekPathMatch() {
 	exDB(func(db *bolt.DB) {
 		// Put a variable path.
 		if err := db.Update(func(tx *bolt.Tx) error {
@@ -53,7 +53,7 @@ func ExamplePathMatch() {
 		if err := db.View(func(tx *bolt.Tx) error {
 			b := tx.Bucket(bucketName)
 
-			path, _ := PathMatch(b.Cursor(), []byte("/blogs/asdf/comments/42"))
+			path, _ := SeekPathMatch(b.Cursor(), []byte("/blogs/asdf/comments/42"))
 			fmt.Println(string(path))
 
 			return nil
@@ -67,10 +67,10 @@ func ExamplePathMatch() {
 
 //TODO ExamplePathConflict
 
-var matchTests = []struct{
-	path string
+var matchTests = []struct {
+	path    string
 	matches []string
-} {
+}{
 	{`/blogs`, []string{`/blogs`}},
 	{`/blogs/`, []string{`/blogs/`}},
 	{`/blogs/:blog_id`, []string{`/blogs/123`}},
@@ -78,7 +78,7 @@ var matchTests = []struct{
 	{`/blogs/:blog_id/comments/`, []string{`/blogs/123/comments/`}},
 	{`/blogs/:blog_id/comments/:comment_id`, []string{`/blogs/123/comments/456`}},
 	{`/blogs/:blog_id/comments/:comment_id/*suffix`,
-	 []string{`/blogs/123/comments/456/test`, `/blogs/123/comments/456/test/test`}},
+		[]string{`/blogs/123/comments/456/test`, `/blogs/123/comments/456/test/test`}},
 }
 
 func TestMatchPath(t *testing.T) {
@@ -107,7 +107,7 @@ func TestMatchPath(t *testing.T) {
 			b := tx.Bucket(bucketName)
 			for _, test := range matchTests {
 				for _, match := range test.matches {
-					k, _ := PathMatch(b.Cursor(), []byte(match))
+					k, _ := SeekPathMatch(b.Cursor(), []byte(match))
 					if k == nil {
 						t.Errorf("expected %q to match %q but got none", match, test.path)
 					} else if !bytes.Equal(k, []byte(test.path)) {
@@ -123,10 +123,10 @@ func TestMatchPath(t *testing.T) {
 }
 
 func TestConflicts(t *testing.T) {
-	for _, test := range []struct{
-		path string
+	for _, test := range []struct {
+		path      string
 		conflicts []string
-	} {
+	}{
 		{`/test/test`, []string{`/test/test`, `/:test`, `/*test`, `/test/:test`, `/test/*test`, `/:test/test`}},
 		{`/:test`, []string{`/:tst`, `/test`, `/*test`}},
 		{`/test/*test`, []string{`/test/*tst`, `/test/test`, `/test/:tst`, `/test/test/test`, `/test/test/:test`, `/test/test/*test`}},
@@ -147,7 +147,7 @@ func TestConflicts(t *testing.T) {
 			if err := db.View(func(tx *bolt.Tx) error {
 				b := tx.Bucket(bucketName)
 				for _, c := range test.conflicts {
-					k, _ := PathConflict(b.Cursor(), []byte(c))
+					k, _ := SeekPathConflict(b.Cursor(), []byte(c))
 					kStr := string(k)
 					if kStr != test.path {
 						t.Errorf("expected %q to match %q but got %q", c, test.path, kStr)
@@ -160,7 +160,6 @@ func TestConflicts(t *testing.T) {
 		})
 	}
 }
-
 
 // Attempts to put all matchTests w/o conflict.
 func TestNoConflicts(t *testing.T) {
@@ -175,7 +174,7 @@ func TestNoConflicts(t *testing.T) {
 			c := b.Cursor()
 			for _, test := range matchTests {
 				pathB := []byte(test.path)
-				if k, _ := PathConflict(c, pathB); k != nil {
+				if k, _ := SeekPathConflict(c, pathB); k != nil {
 					t.Errorf("unexpected conflict with %q: %s", test.path, string(k))
 				}
 
@@ -191,7 +190,7 @@ func TestNoConflicts(t *testing.T) {
 }
 
 func Benchmark(b *testing.B) {
-	b.Run("standard", forEachDB("standard", strings.NewReplacer(":","","*","").Replace))
+	b.Run("standard", forEachDB("standard", strings.NewReplacer(":", "", "*", "").Replace))
 	b.Run("branchFactor", forEachDB("branchFactor", nil))
 	b.Run("segmentCount", forEachDB("segmentCount", nil))
 	b.Run("segmentSize", forEachDB("segmentSize", nil))
@@ -257,7 +256,7 @@ func benchMatch(testdb string, pathFn func(path string) string) func(b *testing.
 		lookup := func(path []byte) error {
 			return db.View(func(tx *bolt.Tx) error {
 				bk := tx.Bucket([]byte("paths"))
-				k, _ := PathMatch(bk.Cursor(), path)
+				k, _ := SeekPathMatch(bk.Cursor(), path)
 				if k == nil {
 					return errors.New("no match found")
 				}
@@ -265,7 +264,7 @@ func benchMatch(testdb string, pathFn func(path string) string) func(b *testing.
 			})
 		}
 
-		for i:=0;i<b.N;i++ {
+		for i := 0; i < b.N; i++ {
 			path := paths[i%len(paths)]
 
 			if err := lookup(path); err != nil {
@@ -280,7 +279,7 @@ func testDB(t *testing.T, f func(db *bolt.DB)) {
 	defer os.Remove(tmp)
 	db, err := bolt.Open(tmp, 0666, nil)
 	if err != nil {
-		t.Fatal("failed to open db:",err)
+		t.Fatal("failed to open db:", err)
 	}
 	defer db.Close()
 	f(db)

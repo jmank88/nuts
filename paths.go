@@ -1,7 +1,7 @@
 /*
 Path Prefix Scans
 
-The prefix scanning methods `PathConflict` and `PathMatch` facilitate maintenance and access to buckets of paths
+The prefix scanning methods `SeekPathConflict` and `SeekPathMatch` facilitate maintenance and access to buckets of paths
 supporting variable elements with exclusive matches.  Paths are `/` delimited, must begin with a `/`, and elements
 beginning with `:` or `*` are variable.
 
@@ -19,8 +19,8 @@ Examples:
 
 Exclusive Matches
 
-Using `PathConflict` to ensure the bucket remains conflict-free guarantees that `PathMatch` will never match more than
-one path.  Two paths conflict if there exists some path which matches both of them.
+Using `SeekPathConflict` before putting new paths to ensure the bucket remains conflict-free guarantees that
+`SeekPathMatch` will never match more than one path.
 
 Examples:
 	Conflicts: /blogs/:blog_id, /blogs/golang
@@ -37,10 +37,11 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-// PathMatch scans c for an entry which matches `path`, or returns `nil, nil` when no match is found.
+
+// SeekPathMatch seeks an entry which matches `path`, or returns `nil, nil` when no match is found.
 // Returned key may be `path`, or a matching dynamic path.
-// Matches are exclusive if the set of keys are conflict free (see PathConflict).
-func PathMatch(c *bolt.Cursor, path []byte) ([]byte, []byte) {
+// Matches are exclusive if the set of keys are conflict free (see SeekPathConflict).
+func SeekPathMatch(c *bolt.Cursor, path []byte) ([]byte, []byte) {
 	// Validation
 	if len(path) == 0 {
 		return nil, nil
@@ -139,9 +140,9 @@ func PathMatch(c *bolt.Cursor, path []byte) ([]byte, []byte) {
 	}
 }
 
-// PathConflict scans entries in c for conflicts with `path`, and returns the first encountered or `nil, nil` if none
+// SeekPathConflict seeks an entry which conflicts with `path`, and returns the first encountered or `nil, nil` if none
 // is found.
-func PathConflict(c *bolt.Cursor, path []byte) ([]byte, []byte) {
+func SeekPathConflict(c * bolt.Cursor, path []byte) ([]byte, []byte) {
 	// Validation
 	if len(path) == 0 {
 		return nil, nil

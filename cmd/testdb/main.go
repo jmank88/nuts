@@ -73,7 +73,7 @@ func copyToBolt(txt string) (err error) {
 					return s.Err()
 				}
 				path := s.Bytes()
-				if k, _ := nuts.PathConflict(b.Cursor(), path); k != nil {
+				if k, _ := nuts.SeekPathConflict(b.Cursor(), path); k != nil {
 					return fmt.Errorf("path %q conflicts with existing %q", string(path), string(k))
 				}
 				if err := b.Put(path, []byte{}); err != nil {

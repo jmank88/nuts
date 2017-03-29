@@ -6,9 +6,9 @@ A collection of [BoltDB](https://github.com/boltdb/bolt) utilities.
 
 ## Path Prefix Scans
 
-The prefix scanning functions `PathConflict` and `PathMatch` facilitate maintenance and access to buckets of paths
-supporting *variable elements* with *exclusive matches*.  Paths are `/` delimited, must begin with a `/`, and elements
-beginning with `:` or `*` are variable.
+The prefix scanning functions `SeekPathConflict` and `SeekPathMatch` facilitate maintenance and access to buckets of 
+paths supporting *variable elements* with *exclusive matches*.  Paths are `/` delimited, must begin with a `/`, and 
+elements beginning with `:` or `*` are variable.
 
 ### Variable Elements
 
@@ -29,7 +29,7 @@ Match: /blogs/42/comments/100/edit
 
 ### Exclusive Matches
 
-Using `PathConflict` before putting new paths to ensure the bucket remains conflict-free guarantees that `PathMatch` 
+Using `SeekPathConflict` before putting new paths to ensure the bucket remains conflict-free guarantees that `SeekPathMatch` 
 will never match more than one path. 
 
 Examples:
