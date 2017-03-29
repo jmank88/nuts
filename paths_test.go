@@ -38,21 +38,22 @@ func exDB(f func(db *bolt.DB)) {
 
 func ExampleSeekPathMatch() {
 	exDB(func(db *bolt.DB) {
-		// Put a variable path.
 		if err := db.Update(func(tx *bolt.Tx) error {
 			b, err := tx.CreateBucket(bucketName)
 			if err != nil {
 				return err
 			}
+
+			// Put a variable path.
 			return b.Put([]byte("/blogs/:blog_id/comments/:comment_id"), []byte{})
 		}); err != nil {
 			log.Fatal(err)
 		}
 
-		// Match path.
 		if err := db.View(func(tx *bolt.Tx) error {
 			b := tx.Bucket(bucketName)
 
+			// Match path.
 			path, _ := SeekPathMatch(b.Cursor(), []byte("/blogs/asdf/comments/42"))
 			fmt.Println(string(path))
 
@@ -65,7 +66,40 @@ func ExampleSeekPathMatch() {
 	// Output: /blogs/:blog_id/comments/:comment_id
 }
 
-//TODO ExamplePathConflict
+func ExampleSeekPathConflict() {
+	exDB(func(db *bolt.DB) {
+		insert := func(path string) {
+			if err := db.Update(func(tx *bolt.Tx) error {
+				b, err := tx.CreateBucketIfNotExists(bucketName)
+				if err != nil {
+					return err
+				}
+
+				if k, _ := SeekPathConflict(b.Cursor(), []byte(path)); k != nil {
+					fmt.Printf("Put(%s) blocked - conflict: %s\n", path, string(k))
+					return nil
+				}
+
+				// Put a variable path.
+				if err := b.Put([]byte(path), []byte{}); err != nil {
+					return err
+				}
+				fmt.Printf("Put(%s)\n", path)
+				return nil
+			}); err != nil {
+				log.Fatal(err)
+			}
+		}
+		insert("/blogs/")
+		insert("/blogs/:blog_id")
+		insert("/blogs/a_blog")
+	})
+
+	// Output:
+	// Put(/blogs/)
+	// Put(/blogs/:blog_id)
+	// Put(/blogs/a_blog) blocked - conflict: /blogs/:blog_id
+}
 
 var matchTests = []struct {
 	path    string
