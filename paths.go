@@ -5,6 +5,11 @@ The prefix scanning methods `SeekPathConflict` and `SeekPathMatch` facilitate ma
 supporting variable elements with exclusive matches.  Paths are `/` delimited, must begin with a `/`, and elements
 beginning with `:` or `*` are variable.
 
+Examples:
+	/
+	/blogs/
+	/blogs/:blog_id
+
 Variable Paths
 
 Path elements beginning with a `:` match any single element.  Path elements beginning with `*` match any remaining
