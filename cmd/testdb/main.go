@@ -1,7 +1,7 @@
 /*
 Command testdb recursively walks the directory given as the first (and only) argument, and copies paths from .txt files
 into .db BoltDB database files by the same name.
- */
+*/
 package main
 
 import (
@@ -67,7 +67,7 @@ func copyToBolt(txt string) (err error) {
 				return err
 			}
 
-			for batch:=0; batch < batchSize; batch++ {
+			for batch := 0; batch < batchSize; batch++ {
 				if !s.Scan() {
 					done = true
 					return s.Err()
