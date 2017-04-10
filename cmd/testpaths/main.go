@@ -2,18 +2,18 @@
 Command testpaths generates files with one path per line.  The first argument is the output directory and the second
 must be one of 'standard', 'branchFactor', 'segmentCount', or 'segmentSize'.  Each additional (integer) argument
 generates a .txt file by the same name.
- */
+*/
 package main
 
 import (
 	"bytes"
 	"crypto/md5"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
-	"io"
 	"strings"
 
 	"github.com/dgryski/go-metro"
@@ -22,7 +22,7 @@ import (
 // A writePathFn should write one path per line to w.
 type writePathFn func(w io.Writer, arg int64)
 
-var writePathFns = map[string]writePathFn {
+var writePathFns = map[string]writePathFn{
 	// Writes count routes of a 'standard' form.
 	"standard": func(w io.Writer, count int64) {
 		for i := int64(0); i < count; i++ {
@@ -59,7 +59,7 @@ var writePathFns = map[string]writePathFn {
 
 	// Writes a route with 5 counts sized segments.
 	"segmentSize": func(w io.Writer, size int64) {
-		path := strings.Repeat("/" + strings.Repeat("a", int(size)), 5)
+		path := strings.Repeat("/"+strings.Repeat("a", int(size)), 5)
 		if _, err := io.WriteString(w, path); err != nil {
 			log.Fatalf("failed to write path %d", size)
 		}
@@ -89,10 +89,9 @@ func main() {
 			log.Fatal("failed to parse argument:", err)
 		}
 
-		createFile(filepath.Join(nameDir, arg + ".txt"), routes, writePath)
+		createFile(filepath.Join(nameDir, arg+".txt"), routes, writePath)
 	}
 }
-
 
 func createFile(name string, arg int64, writePath writePathFn) {
 	f, err := os.Create(name)
@@ -102,6 +101,7 @@ func createFile(name string, arg int64, writePath writePathFn) {
 	defer f.Close()
 	writePath(f, arg)
 }
+
 const (
 	seed1 = 33928
 	seed2 = 9274035
@@ -117,9 +117,9 @@ func generateRoute(u uint64) string {
 	s := make([]byte, 0, 32)
 	h1, h2 := metro.Hash128([]byte{byte(u >> 24), byte(u >> 8), byte(u), byte(u >> 16)}, seed1)
 	h3, h4 := metro.Hash128([]byte{byte(u), byte(u >> 16), byte(u >> 8), byte(u >> 24)}, seed2)
-	for _, h := range []uint64{h1,h2,h3,h4} {
+	for _, h := range []uint64{h1, h2, h3, h4} {
 		var i uint
-		for ; i < 64; i+=8 {
+		for ; i < 64; i += 8 {
 			s = append(s, byte(h>>i))
 		}
 	}
@@ -140,8 +140,8 @@ func generateRoute(u uint64) string {
 				b.WriteString(`:param`)
 			}
 		} else {
-			nameStart := i*each
-			fmt.Fprintf(&b, "%x", s[nameStart:nameStart + each])
+			nameStart := i * each
+			fmt.Fprintf(&b, "%x", s[nameStart:nameStart+each])
 		}
 	}
 

@@ -42,7 +42,6 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-
 // SeekPathMatch seeks an entry which matches `path`, or returns `nil, nil` when no match is found.
 // Returned key may be `path`, or a matching dynamic path.
 // Matches are exclusive if the set of keys are conflict free (see SeekPathConflict).
@@ -103,7 +102,7 @@ func SeekPathMatch(c *bolt.Cursor, path []byte) ([]byte, []byte) {
 			if ki < 0 {
 				prefixBuf.Write(k[len(prefix):])
 			} else {
-				prefixBuf.Write(k[len(prefix):len(prefix)+ki])
+				prefixBuf.Write(k[len(prefix) : len(prefix)+ki])
 			}
 
 			if last {
@@ -147,7 +146,7 @@ func SeekPathMatch(c *bolt.Cursor, path []byte) ([]byte, []byte) {
 
 // SeekPathConflict seeks an entry which conflicts with `path`, and returns the first encountered or `nil, nil` if none
 // is found.
-func SeekPathConflict(c * bolt.Cursor, path []byte) ([]byte, []byte) {
+func SeekPathConflict(c *bolt.Cursor, path []byte) ([]byte, []byte) {
 	// Validation
 	if len(path) == 0 {
 		return nil, nil
@@ -258,4 +257,3 @@ func SeekPathConflict(c * bolt.Cursor, path []byte) ([]byte, []byte) {
 		}
 	}
 }
-
