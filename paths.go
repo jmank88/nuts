@@ -1,3 +1,5 @@
+package nuts
+
 /*
 Path Prefix Scans
 
@@ -34,7 +36,6 @@ Examples:
 	Conflicts: /blogs/*, /blogs/:blog_id/comments
 	Match:     /blogs/42/comments
 */
-package nuts
 
 import (
 	"bytes"
