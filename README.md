@@ -1,6 +1,6 @@
 # Nuts - BoltDB Utilities
 
-[![GoDoc](https://godoc.org/github.com/jmank88/nuts?status.svg)](https://godoc.org/github.com/jmank88/nuts) [![Go Report Card](https://goreportcard.com/badge/github.com/jmank88/nuts)](https://goreportcard.com/report/github.com/jmank88/nuts)
+[![GoDoc](https://godoc.org/github.com/jmank88/nuts?status.svg)](https://godoc.org/github.com/jmank88/nuts) [![Go Report Card](https://goreportcard.com/badge/github.com/jmank88/nuts)](https://goreportcard.com/report/github.com/jmank88/nuts) [![Coverage Status](https://coveralls.io/repos/github/jmank88/nuts/badge.svg?branch=master)](https://coveralls.io/github/jmank88/nuts?branch=master)
 
 A collection of [BoltDB](https://github.com/boltdb/bolt) utilities.
 
