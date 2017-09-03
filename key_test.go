@@ -28,7 +28,7 @@ func TestKeyLen(t *testing.T) {
 	}
 }
 
-func TestNewCacheIntKeyBuf(t *testing.T) {
+func TestKey(t *testing.T) {
 	for _, test := range []struct {
 		max int
 		xs  []uint64
