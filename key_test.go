@@ -30,7 +30,7 @@ func TestKeyLen(t *testing.T) {
 
 func TestKey(t *testing.T) {
 	for _, test := range []struct {
-		max int
+		max int64
 		xs  []uint64
 		bs  [][]byte
 	}{
@@ -101,7 +101,7 @@ func TestKey(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(strconv.Itoa(test.max), func(t *testing.T) {
+		t.Run(strconv.FormatInt(test.max, 10), func(t *testing.T) {
 			k := make(Key, KeyLen(uint64(test.max)))
 			for i, x := range test.xs {
 				k.Put(x)
